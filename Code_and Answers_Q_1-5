@@ -18,12 +18,16 @@ median(total.steps, na.rm = TRUE)
 
 ## 3. What is the average daily activity pattern?
 
+## Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
 library(ggplot2)
 averages <- aggregate(x = list(steps = data$steps), by = list(interval = data$interval), 
     FUN = mean, na.rm = TRUE)
 ggplot(data = averages, aes(x = interval, y = steps)) + geom_line() + xlab("5-minute interval") + 
     ylab("average number of steps taken")
     
+## Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
 averages[which.max(averages$steps), ]
 ##     interval steps
 ## 104      835 206.2
@@ -38,6 +42,8 @@ table(missing)
 ## FALSE  TRUE 
 ## 15264  2304
 
+## Devise a strategy for filling in all of the missing values in the dataset. 
+
 total.steps <- tapply(filled.data$steps, filled.data$date, FUN = sum)
 qplot(total.steps, binwidth = 1000, xlab = "total number of steps taken each day")
 
@@ -49,6 +55,8 @@ median(total.steps)
 
 ## 5. Are there differences in activity patterns between weekdays and weekends?
 
+## Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
 weekday.or.weekend <- function(date) {
     day <- weekdays(date)
     if (day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")) 
@@ -59,5 +67,8 @@ filled.data$date <- as.Date(filled.data$date)
 filled.data$day <- sapply(filled.data$date, FUN = weekday.or.weekend)
 
 averages <- aggregate(steps ~ interval + day, data = filled.data, mean)
+
+## Make a panel plot.
+
 ggplot(averages, aes(interval, steps)) + geom_line() + facet_grid(day ~ .) + 
     xlab("5-minute interval") + ylab("Number of steps")
